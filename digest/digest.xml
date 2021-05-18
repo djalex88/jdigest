@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="2.5" type="plugin" group="system">
+	<name>plg_system_digest</name>
+	<author>djalex88</author>
+	<creationDate>January 2015</creationDate>
+	<copyright>Copyright (c) 2015 djalex88</copyright>
+	<license>MIT</license>
+	<version>1.0</version>
+	<description>PLG_SYSTEM_DIGEST_XML_DESCRIPTION</description>
+	<files>
+		<filename plugin="digest">digest.php</filename>
+		<filename>passwords.php</filename>
+		<filename>index.html</filename>
+		<folder>language</folder>
+	</files>
+	<languages folder="language">
+		<language tag="en-GB">en-GB/en-GB.plg_system_digest.ini</language>
+		<language tag="en-GB">en-GB/en-GB.plg_system_digest.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+
+			<fieldset name="basic">
+
+				<field name="realm"
+					type="text"
+					label="PLG_SYSTEM_DIGEST_FIELD_REALM_LABEL"
+					description="PLG_SYSTEM_DIGEST_FIELD_REALM_DESC"
+					size="100"
+				/>
+
+				<field name="password_file"
+					type="text"
+					label="PLG_SYSTEM_DIGEST_FIELD_P_FILE_LABEL"
+					description="PLG_SYSTEM_DIGEST_FIELD_P_FILE_DESC"
+					size="100"
+				/>
+
+				<field name="nonce_lifetime"
+					type="text"
+					label="PLG_SYSTEM_DIGEST_FIELD_NONCE_LIFETIME_LABEL"
+					description="PLG_SYSTEM_DIGEST_FIELD_NONCE_LIFETIME_DESC"
+					size="6"
+					default="300"
+				/>
+
+			</fieldset>
+
+		</fields>
+	</config>
+</extension>
