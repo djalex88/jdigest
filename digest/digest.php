@@ -56,29 +56,12 @@ class PlgSystemDigest extends JPlugin
 
 		// check authentication header
 
-		if(isset($_SERVER['PHP_AUTH_DIGEST']))
+		if(isset($_SERVER['PHP_AUTH_DIGEST']) and $this->authenticate())
 		{
-			if($this->authenticate())
-			{
-				return; // Ok
-			}
-			elseif($this->session->get('digest_auth_nonce', -1) !== -1)
-			{
-				sleep(3);
-			}
+			return; // Ok
 		}
 
 		$this->sendAuthHeader(); // require authentication
-	}
-
-	public function onUserLogout($user, $options = array())
-	{
-		if($this->app->isAdmin())
-		{
-			$this->session->set('digest_auth_nonce', -1);
-		}
-
-		return true;
 	}
 
 	protected function generateNonce()
@@ -238,6 +221,9 @@ class PlgSystemDigest extends JPlugin
 				array(
 					'username' => $user->username,
 					'password' => $user->password,
+				),
+				array(
+					'silent' => true,
 				)
 			);
 		}
@@ -273,8 +259,6 @@ class PlgSystemDigest extends JPlugin
 					padding: 0.25em 1em;
 					background-color: maroon;
 					color: white;
-					font-family: monospace;
-					font-size: 12pt;
 				">
 					$text
 			</span>
