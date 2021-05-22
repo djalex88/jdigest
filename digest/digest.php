@@ -23,6 +23,10 @@
 
 defined('_JEXEC') or die;
 
+/**
+ * Digest authentication plugin.
+ *
+ */
 class PlgSystemDigest extends JPlugin
 {
 	public function __construct(&$subject, $config = array())
@@ -33,6 +37,13 @@ class PlgSystemDigest extends JPlugin
 		$this->session = JFactory::getSession();
 	}
 
+	/**
+	 * An event listener to be called after initialization.
+	 *
+	 * If digest authentication data is invalid, the application terminates with authentication request.
+	 *
+	 * @return void
+	 */
 	public function onAfterInitialise()
 	{
 		if($this->app->isSite())
@@ -64,11 +75,38 @@ class PlgSystemDigest extends JPlugin
 		$this->sendAuthHeader(); // require authentication
 	}
 
+	//
+	// helpers
+	//
+
+	/**
+	 * Generates base64-encoded random string.
+	 *
+	 * @return string
+	 */
 	protected function generateNonce()
 	{
-		return base64_encode(random_bytes(30));
+		if(version_compare(phpversion(), '7.0.0') >= 0)
+		{
+			$random = random_bytes(30);
+		}
+		else
+		{
+			// try /dev/urandom directly
+
+			$f = fopen('/dev/urandom', 'rb');
+			$random = fread($f, 30);
+			fclose($f);
+		}
+
+		return base64_encode($random);
 	}
 
+	/**
+	 * Sends authentication header and terminates the application.
+	 *
+	 * @return void
+	 */
 	protected function sendAuthHeader()
 	{
 		// generate nonce and store in session
@@ -89,6 +127,13 @@ class PlgSystemDigest extends JPlugin
 		$this->terminate("Authorization required!");
 	}
 
+	/**
+	 * Tries to extracts data from authorizaton header.
+	 *
+	 * @param array &$data Authentication data
+	 *
+	 * @return boolean True on success
+	 */
 	protected function parseAuthHeader(&$data)
 	{
 		$authHeader = $_SERVER['PHP_AUTH_DIGEST'];
@@ -120,6 +165,11 @@ class PlgSystemDigest extends JPlugin
 		return true;
 	}
 
+	/**
+	 * Checks digest authentication data.
+	 *
+	 * @return boolean True on success
+	 */
 	protected function authenticate()
 	{
 		// try to extract data from PHP_AUTH_DIGEST string
@@ -215,7 +265,7 @@ class PlgSystemDigest extends JPlugin
 		// one more step:
 		// Joomla's authentication (if configured)
 
-		if(JFactory::getUser()->get('guest') == 1)
+		if(JFactory::getUser()->get('guest') == 1 and $this->params->get('auto_login', false))
 		{
 			$this->app->login(
 				array(
@@ -231,6 +281,13 @@ class PlgSystemDigest extends JPlugin
 		return true;
 	}
 
+	/**
+	 * Sends a message and stops the application.
+	 *
+	 * @param string &text Message
+	 *
+	 * @return void
+	 */
 	protected function terminate($text)
 	{
 		$html = <<<HTML
